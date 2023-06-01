@@ -1,26 +1,38 @@
 <script lang="ts">
 
+export const enum OverviewCardType {
+    Blue = 0,
+    Green = 1,
+    Red = 2,
+}
+
 export default {
     name: 'OverviewCard',
     props: {
         title: String,
         value: Number,
-        color1: String,
-        color2: String,
+        type: Number,
     },
     computed: {
-        colorFrom() {
-            if (this.color1 == undefined)
-                return 'from-cyan-500';
-            return `from-${this.color1}-500`
-        },
-        colorTo() {
-            if (this.color2 == undefined)
-                return 'to-cyan-500';
-            return `to-${this.color2}-500`
-        },
         cardStyle() {
-            return `bg-gradient-to-tr ${this.colorFrom} ${this.colorTo} px-5 py-2 rounded-lg w-1/3 mx-5`
+            let style = ['bg-gradient-to-tr', 'px-5', 'py-2', 'rounded-lg', 'w-1/3', 'mx-5']
+
+            switch (this.type) {
+                case OverviewCardType.Blue:
+                    style.push('from-cyan-500', 'to-blue-500')
+                    break
+                case OverviewCardType.Green:
+                    style.push('from-teal-500', 'to-green-500')
+                    break
+                case OverviewCardType.Red:
+                    style.push('from-yellow-500', 'to-red-500')
+                    break
+                default:
+                    style.push('from-gray-500', 'to-gray-500')
+                    break
+            }
+
+            return style
         }
     },
 }

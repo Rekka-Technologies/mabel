@@ -11,29 +11,27 @@ import (
 )
 
 func main() {
-
+	// Connect to the database
 	models.ConnectDataBase()
 
+	// Setup Router
 	r := gin.Default()
 
-	public := r.Group("/api")
-
+	public := r.Group("/auth")
 	public.POST("/register", auth.Register)
 	public.POST("/login", auth.Login)
 
-	protected := r.Group("/api/admin")
+	protected := r.Group("/api")
 	protected.Use(JwtAuthMiddleware())
-	protected.GET("/user", endpoints.CurrentUser)
 	protected.POST("/transactions", endpoints.AddTransaction)
 	protected.GET("/transactions", endpoints.GetTransactions)
 
 	r.Run(":8080")
-
 }
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := models.TokenValid(c)
+		_, err := models.TokenValid(c)
 		if err != nil {
 			c.String(http.StatusUnauthorized, "Unauthorized")
 			c.Abort()

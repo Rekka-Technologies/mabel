@@ -1,11 +1,19 @@
 <script lang="ts">
 
-import OverviewCard from '../components/OverviewCard.vue';
+import OverviewCard, {OverviewCardType} from '../components/OverviewCard.vue';
+
 
 export default {
     name: 'Ledger',
     components: {
         OverviewCard,
+    },
+    data() {
+        return {
+            CARD_BLUE: OverviewCardType.Blue,
+            CARD_GREEN: OverviewCardType.Green,
+            CARD_RED: OverviewCardType.Red,
+        }
     },
 }
 
@@ -28,9 +36,9 @@ export default {
 
         <!-- Overview Cards -->
         <div class="flex flex-row justify-between my-5">
-            <OverviewCard title="Credit" value="$9,000" color1="cyan" color2="blue" />
-            <OverviewCard title="Debit" value="$9,000" color1="yellow" color2="red" />
-            <OverviewCard title="Transactions" value="9000" color1="teal" color2="green" />
+            <OverviewCard title="Credit" value="$9,000" :type="CARD_BLUE" />
+            <OverviewCard title="Debit" value="$9,000" :type="CARD_RED" />
+            <OverviewCard title="Transactions" value="9000" :type="CARD_GREEN" />
         </div>
 
         <!-- Options Bar -->

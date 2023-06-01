@@ -2,24 +2,29 @@ package endpoints
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Rekka-Technologies/mabel/backend/internal/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 )
 
 type TransactionInput struct {
 	Name      string  `json:"name" binding:"required"`
-	Reference string  `json:"reference"`
 	Amount    float64 `json:"amount" binding:"required"`
+	Reference string  `json:"reference"`
+	Date      string  `json:"date"`
 }
 
 func AddTransaction(c *gin.Context) {
-	user_id, err := models.ExtractTokenID(c)
+	// Check if the user is authenticated
+	user_id, err := models.ExtractTokenUID(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	// Validate input
 	var input TransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -33,7 +38,22 @@ func AddTransaction(c *gin.Context) {
 		Amount:    input.Amount,
 	}
 
-	res, err := t.SaveTransaction()
+	// Set the date to today if it is not provided, this just allows the user
+	// to override or backdate the transaction date.
+	if input.Date == "" {
+		t.Date = datatypes.Date(time.Now())
+	} else {
+		// Parse the date string as `YYYY-MM-DD` and set it as the transaction
+		// date to backdate the transaction.
+		backdate, err := time.Parse(time.DateOnly, input.Date)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		t.Date = datatypes.Date(backdate)
+	}
+
+	res, err := t.Create()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -43,12 +63,14 @@ func AddTransaction(c *gin.Context) {
 }
 
 func GetTransactions(c *gin.Context) {
-	user_id, err := models.ExtractTokenID(c)
+	// Check if the user is authenticated
+	user_id, err := models.ExtractTokenUID(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	// Get the transactions for the user
 	t, err := models.GetTransactions(user_id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

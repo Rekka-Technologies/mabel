@@ -12,6 +12,11 @@ export function createRouter(_app: App): Router {
                 redirect: '/ledger',
             },
             {
+                name: 'login',
+                path: '/login',
+                component: () => import('./views/Login.vue'),
+            },
+            {
                 name: 'ledger',
                 path: '/ledger',
                 component: () => import('./views/Ledger.vue'),
