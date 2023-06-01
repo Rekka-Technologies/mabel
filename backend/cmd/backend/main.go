@@ -7,6 +7,7 @@ import (
 	"github.com/Rekka-Technologies/mabel/backend/internal/endpoints"
 	"github.com/Rekka-Technologies/mabel/backend/internal/models"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,9 @@ func main() {
 
 	// Setup Router
 	r := gin.Default()
+
+	// Setup the CORS middleware
+	r.Use(cors.Default())
 
 	public := r.Group("/auth")
 	public.POST("/register", auth.Register)

@@ -1,8 +1,9 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import './style.css'
 
 import App from './App.vue'
-import { createRouter } from './router'
+import { router } from './router'
 
 // Font Awesome Icons
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -13,12 +14,16 @@ import {fas} from "@fortawesome/free-solid-svg-icons";
 // Create a new Vue app
 const app = createApp(App)
 
+// Setup Pinia
+const pinia = createPinia()
+
 // Set default font awesome icon set to Solid
 library.add(fas) 
 
 // Mount the router and plugins to the Application
 app
-  .use(createRouter(app))
+  .use(pinia)
+  .use(router)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app')
 

@@ -78,7 +78,7 @@ func LoginCheck(username string, password string) (token string, err error) {
 	}
 
 	// Generate jwt token
-	token, err = GenerateToken(u.ID)
+	token, err = GenerateToken(u)
 	if err != nil {
 		return "", err
 	}

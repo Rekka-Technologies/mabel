@@ -14,7 +14,7 @@ import (
 // GenerateToken generates a jwt token for a given user, this utilises multiple
 // server env variables to determine the token lifespan and the secret key.
 // The token is signed using HMAC and SHA256.
-func GenerateToken(user_id uint) (string, error) {
+func GenerateToken(user User) (string, error) {
 
 	// Fetch the Lifespan of the token from the env file, this will be used
 	// to determine when the token will expire.
@@ -26,7 +26,8 @@ func GenerateToken(user_id uint) (string, error) {
 	// Build the token
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["user_id"] = user_id
+	claims["user_id"] = user.ID
+	claims["user_name"] = user.Username
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(token_lifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
