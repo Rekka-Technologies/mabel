@@ -19,7 +19,10 @@ func main() {
 	r := gin.Default()
 
 	// Setup the CORS middleware
-	r.Use(cors.Default())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "Authorization")
+	corsConfig.AllowAllOrigins = true
+	r.Use(cors.New(corsConfig))
 
 	public := r.Group("/auth")
 	public.POST("/register", auth.Register)

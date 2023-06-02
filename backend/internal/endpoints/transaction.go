@@ -6,7 +6,6 @@ import (
 
 	"github.com/Rekka-Technologies/mabel/backend/internal/models"
 	"github.com/gin-gonic/gin"
-	"gorm.io/datatypes"
 )
 
 type TransactionInput struct {
@@ -41,7 +40,7 @@ func AddTransaction(c *gin.Context) {
 	// Set the date to today if it is not provided, this just allows the user
 	// to override or backdate the transaction date.
 	if input.Date == "" {
-		t.Date = datatypes.Date(time.Now())
+		t.Date = time.Now().Format(time.DateOnly)
 	} else {
 		// Parse the date string as `YYYY-MM-DD` and set it as the transaction
 		// date to backdate the transaction.
@@ -50,7 +49,7 @@ func AddTransaction(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		t.Date = datatypes.Date(backdate)
+		t.Date = backdate.Format(time.DateOnly)
 	}
 
 	res, err := t.Create()

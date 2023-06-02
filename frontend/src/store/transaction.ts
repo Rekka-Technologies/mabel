@@ -2,44 +2,76 @@ import { defineStore } from 'pinia'
 
 import { LedgerRecord } from '../models/LedgerRecord'
 
-export const useAuthStore = defineStore('transaction', {
+const BASE_URL = 'http://localhost:8080/api'
+
+export const useTransactionStore = defineStore('transaction', {
     state: () => ({ 
         transactions: [] as LedgerRecord[],
     }),
+    getters: {
+        getTransactions(): LedgerRecord[] {
+            return this.transactions
+        }
+    },
     actions: {
-      actions: {
-        async getTransactions() {
-            const response = await fetch('http://localhost:8000/api/transactions/', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('mable') || '',
-                },
-            })
-            if (response.status !== 200) {
-                throw new Error('Failed to fetch transactions')
-            }
+        fetchTransactions(successCb: (data : LedgerRecord[]) => void, errorCb: (err : string) => void) {
+            fetch(`${BASE_URL}/transactions`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('mable') || '',
+                    },
+                })
+                .then((response) => {
+                    response.json()
+                        .then((data) => {
+                            if (response.status !== 200) {
+                                throw new Error(data.error)
+                            }
 
-            const data = await response.json()
-            this.transactions = LedgerRecord.fromJsonArray(data.data)
+                            // Set the transactions
+                            this.transactions = LedgerRecord.fromJsonArray(data.data)
+                            successCb(this.transactions)
+                        })
+                        .catch((error) => {
+                            errorCb(error.message)
+                        }
+                    )
+                })
+                .catch((error) => {
+                    errorCb(error.message)
+                }
+            )
         },
-        async addTransaction(transaction: LedgerRecord) {
-            const response = await fetch('http://localhost:8000/api/transactions/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('mable') || '',
-                },
-                body: JSON.stringify(transaction),
-            })
+        addTransaction(transaction: LedgerRecord, successCb: () => void, errorCb: (err : string) => void) {
+            fetch(`${BASE_URL}/transactions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('mable') || '',
+                    },
+                    body: JSON.stringify(transaction),
+                })
+                .then((response) => {
+                    response.json()
+                        .then((data) => {
+                            if (response.status !== 200) {
+                                throw new Error(data.error)
+                            }
 
-            if (response.status !== 200) {
-                throw new Error('Failed to add transactions')
-            }
-
-            const data = await response.json()
-            this.transactions.push(LedgerRecord.fromJson(data.data))
+                            // Update State with the new transaction
+                            this.transactions.push(LedgerRecord.fromJson(data.data))
+                            successCb()
+                        })
+                        .catch((error) => {
+                            errorCb(error.message)
+                        }
+                    )
+                })
+                .catch((error) => {
+                    errorCb(error.message)
+                }
+            )
         }
       }
-    },
   })

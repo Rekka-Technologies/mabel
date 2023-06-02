@@ -2,16 +2,15 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"gorm.io/datatypes"
 )
 
 type Transaction struct {
 	gorm.Model
-	UserId    uint           `gorm:"not null;" json:"user_id"`
-	Name      string         `gorm:"size:255; not null;" json:"name"`
-	Reference string         `gorm:"size:255; null;" json:"reference"`
-	Amount    float64        `gorm:"not null;" json:"amount"`
-	Date      datatypes.Date `gorm:"not null;" json:"date"`
+	UserId    uint    `gorm:"not null;" json:"user_id"`
+	Name      string  `gorm:"size:255; not null;" json:"name"`
+	Reference string  `gorm:"size:255; null;" json:"reference"`
+	Amount    float64 `gorm:"not null;" json:"amount"`
+	Date      string  `gorm:"size:255; not null;" json:"date"`
 }
 
 func (t *Transaction) Create() (*Transaction, error) {
