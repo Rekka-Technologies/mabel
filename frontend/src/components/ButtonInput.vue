@@ -1,19 +1,3 @@
-<template>
-    <div v-if="disabled"
-        class="select-none text-center py-2 flex rounded-lg border bg-gray-50/25 border-gray-400 text-gray-300 "
-        :class="additionalClasses">
-        <p class="text-center mx-auto my-auto">{{text}}</p>
-    </div>
-    <div @click="clickEvent" v-else
-        :class="btnClass.concat(' ', additionalClasses)"
-        class="select-none text-center py-2 group flex cursor-pointer rounded-lg ">
-        
-        <p class="text-center mx-auto my-auto">
-            {{text}}
-        </p>
-    </div>
-</template>
-
 <script lang="ts">
 
 export const btnType = {
@@ -135,3 +119,19 @@ export default {
 }
 
 </script>
+
+<template>
+    <div v-if="disabled"
+        class="select-none text-center py-2 flex rounded-lg border bg-gray-50/25 border-gray-400 text-gray-300 "
+        :class="additionalClasses">
+        <p class="text-center mx-auto my-auto">{{text}}</p>
+    </div>
+    <div @click="clickEvent" v-else
+        :class="btnClass.concat(' ', additionalClasses)"
+        class="select-none text-center py-2 group flex cursor-pointer rounded-lg ">
+        
+        <p class="text-center mx-auto my-auto">
+            {{text}}
+        </p>
+    </div>
+</template>

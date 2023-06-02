@@ -28,6 +28,11 @@ export default {
             required: false,
             default: false
         },
+        hidden: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         validate: {
             type: Function,
             required: false,
@@ -41,14 +46,10 @@ export default {
     },
     computed: {
         validValue() {
-            if (this.value) {
-                try {
-                    return this.validate(this.value);
-                } catch (e) {
-                    return false;
-                }
-            }
-            return true;
+            return this.validate(this.value);
+        },
+        inputType() {
+            return this.hidden ? 'password' : 'text';
         }
     }
 }
@@ -58,15 +59,19 @@ export default {
 
 <template>
     <div class="w-full">
+        <!-- Optional Label for the Input Field -->
         <p v-if="label">{{ label }}</p>
-        <input type="text" v-if="!disabled"
+
+        <input :type="inputType" v-if="!disabled"
             class="block w-full p-2 border rounded-lg bg-white border-gray-200 placeholder-gray-300 text-black focus:ring-gray-500 focus:border-gray-500"
             :class="{'border-red-400 focus:ring-red-400 focus:border-red-400': !validValue}"
             :placeholder="placeholder" :value="value"
             @input="(e) => OnChange((e.target as HTMLInputElement).value)"
             @keyup.enter="() => { if (validValue) OnEnter()} "
         >
-        <input type="text" v-else disabled
+
+        <!-- What to display if the input field is disabled -->
+        <input :type="inputType" v-else disabled
             class="block w-full select-none p-2 rounded-lg border bg-gray-200 border-gray-200 placeholder-gray-10 text-white"
             :placeholder="placeholder" :value="value"
             @input="(e) => OnChange((e.target as HTMLInputElement).value)"

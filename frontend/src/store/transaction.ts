@@ -44,13 +44,20 @@ export const useTransactionStore = defineStore('transaction', {
             )
         },
         addTransaction(transaction: LedgerRecord, successCb: () => void, errorCb: (err : string) => void) {
+            // Validate the transaction
+            if (!transaction.Validate()) {
+                errorCb('Invalid transaction')
+                return
+            }
+
+            // Send the transaction to the backend
             fetch(`${BASE_URL}/transactions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + localStorage.getItem('mable') || '',
                     },
-                    body: JSON.stringify(transaction),
+                    body: transaction.toJson(),
                 })
                 .then((response) => {
                     response.json()

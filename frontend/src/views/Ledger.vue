@@ -9,6 +9,8 @@ import { useAuthStore } from '../store/auth';
 import { LedgerRecord } from '../models/LedgerRecord';
 import OverviewCard, {OverviewCardType} from '../components/OverviewCard.vue';
 import InputField from '../components/InputField.vue';
+import ButtonInput, {btnType} from '../components/ButtonInput.vue';
+import AddTransactionModal from '../components/AddTransactionModal.vue';
 
 // Search imports
 import Fuse from 'fuse.js'
@@ -18,6 +20,8 @@ export default {
     components: {
         OverviewCard,
         InputField,
+        ButtonInput,
+        AddTransactionModal,
     },
     data() {
         return {
@@ -25,10 +29,19 @@ export default {
             CARD_GREEN: OverviewCardType.Green,
             CARD_RED: OverviewCardType.Red,
 
+            BTN_PRIMARY: btnType.primary,
+            BTN_SECONDARY: btnType.secondary,
+
+
+            // Fuse search requirements to search the ledger
             searchQuery: '',
             searchedData: [] as LedgerRecord[],
             fuseSearch: new Fuse<LedgerRecord>([]),
             searchParams: ['date', 'name', 'reference', 'amount'],
+
+            // Modal Triggers
+            addTransactionModal: false,
+
         }
     },
     methods: {
@@ -56,29 +69,23 @@ export default {
             return results.map((r) => r.item);
         },
 
+        // Overview card values
         credit(): string {
-            let total = 0.0;
-            this.getTransactions.map((t) => {
-                if (t.amount > 0) {
-                    total += t.amount;
-                }
-            });
+            const total = this.getTransactions.reduce((acc, t) => (t.amount > 0 ? acc + t.amount : acc), 0);
             return `$${total.toFixed(2)}`;
         },
         debit(): string {
-            let total = 0.0;
-            this.getTransactions.map((t) => {
-                if (t.amount < 0) {
-                    total += (t.amount * -1.0);
-                }
-            });
+            const total = this.getTransactions.reduce((acc, t) => (t.amount < 0 ? acc + (t.amount * -1.0) : acc), 0);
             return `$${total.toFixed(2)}`;
         },
         numTransactions(): number {
             return this.getTransactions.length;
         },
 
-        // Display the 
+        // Returns the date of the most recent transaction in the ledger. If the
+        // ledger is empty, it displays "No transactions" instead. Note that 
+        // this date represents the last time a transaction was made, regardless
+        // of whether it was added to the ledger via UI or not.
         lastUpdated(): string {
             let curDate = new Date(0);
 
@@ -125,7 +132,7 @@ export default {
                 <h1 class="text-3xl font-mono font-medium">#Ledger</h1>
                 <div class="my-1">
                     <p class="font-semibold text-gray-900 leading-none">{{ getUserName }}</p>
-                    <p class="text-sm text-gray-500 cursor-pointer" @click="logout">Logout</p>
+                    <p class="text-sm text-gray-500 cursor-pointer hover:text-gray-300" @click="logout">Logout</p>
                 </div>    
             </div>
             <p class="w-full bg-gray-100 border-l-8 border-gray-600 pl-2 mb-2">
@@ -140,23 +147,21 @@ export default {
 
         <!-- Overview Cards -->
         <div class="flex flex-row my-5 items-center flex-wrap justify-center sm:flex-nowrap sm:flex-row sm:justify-between">
-            <OverviewCard title="Credit" :value="credit" :type="CARD_BLUE" />
-            <OverviewCard title="Debit" :value="debit" :type="CARD_RED" />
-            <OverviewCard class="mt-2 sm:mt-0" title="Transactions" :value="numTransactions" :type="CARD_GREEN" />
+            <overview-card title="Credit" :value="credit" :type="CARD_BLUE" />
+            <overview-card title="Debit" :value="debit" :type="CARD_RED" />
+            <overview-card class="mt-2 sm:mt-0" title="Transactions" :value="numTransactions" :type="CARD_GREEN" />
         </div>
 
+        <!-- Search Bar -->
+        <div class="mb-3">
+            <input-field :value="searchQuery" placeholder="Search..." :OnChange="(val : string) => searchQuery = val" />
+        </div>
+        
         <!-- Options Bar -->
         <div class="flex flex-row text-lg mb-5 space-x-3">
-            <!-- Search Bar -->
-            <input-field :value="searchQuery" placeholder="Search..." :OnChange="(val : string) => searchQuery = val" />
-
             <!-- Export and Add Buttons -->
-            <div class="bg-gray-600 hover:bg-gray-800 rounded flex px-2 cursor-pointer">
-                <p class="m-auto text-white">Export</p>
-            </div>
-            <div class="bg-gray-600 hover:bg-gray-800 rounded flex px-2 cursor-pointer">
-                <p class="m-auto text-white">Add</p>
-            </div>
+            <button-input text="Export Ledger" :OnClick="() => {}" />
+            <button-input text="Add Transaction" :type="BTN_SECONDARY" :OnClick="() => addTransactionModal = !addTransactionModal" />
         </div>
 
         <!-- Table -->
@@ -167,7 +172,7 @@ export default {
                         <th class="text-left">Date</th>
                         <th class="text-left">Name</th>
                         <th>Reference</th>
-                        <th>Amount</th>
+                        <th class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -184,5 +189,8 @@ export default {
                 </tbody>
             </table>
         </div>
+
+        <!-- Modals -->
+        <add-transaction-modal :open="addTransactionModal" />
     </div>
 </template>

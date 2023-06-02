@@ -11,6 +11,7 @@ export class LedgerRecord {
     /**
      * The constructor for the LedgerRecord class.
      * 
+     * @param id Unique id of the transaction
      * @param date Date in ISO format (YYYY-MM-DD)
      * @param name Name of the transaction
      * @param reference Reference id of the transaction
@@ -24,6 +25,38 @@ export class LedgerRecord {
         this.reference = reference;
         this.amount = amount;
         this.tags = tags;
+    }
+
+    public Validate(): boolean {
+        // Check if the date, name, and amount are set
+        if (this.date === '' || this.name === '' || this.amount === 0) {
+            return false;
+        }
+        
+        // Check date format
+        const timestamp = Date.parse(this.date);
+        if (isNaN(timestamp)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public toJson(): string {
+        const date = new Date(this.date); 
+        return JSON.stringify(
+            {
+                date: date.toISOString().split('T')[0],
+                name: this.name,
+                reference: this.reference,
+                amount: this.amount,
+            }
+        );
+    }
+
+    static empty(): LedgerRecord {
+        const date = new Date(Date.now());
+        return new LedgerRecord(0, `${date.getDate}/${date.getMonth}/${date.getFullYear}`, '', null, 0, null);
     }
 
     /**

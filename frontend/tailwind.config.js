@@ -2,11 +2,13 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{html,ts,vue}"
+    "./src/**/*.{html,ts,vue}",
+    "./node_modules/vue-tailwind-datepicker/**/*.js"
   ],
   theme: {
-    extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }
 

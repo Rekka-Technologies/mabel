@@ -66,7 +66,7 @@ export default {
             
             
             <input-field placeholder="Username" :value="Username" :OnChange="(val : string) => { Username = val}" />
-            <input-field placeholder="Password" :value="Password" :OnChange="(val : string) => { Password = val}" />
+            <input-field placeholder="Password" hidden :value="Password" :OnChange="(val : string) => { Password = val}" />
             <button-input :text="btnText" :OnClick="submit" />
 
             <p v-if="errorMsg" class="text-red-500">{{ errorMsg }}</p>
